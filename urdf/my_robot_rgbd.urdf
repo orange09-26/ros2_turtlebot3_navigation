@@ -138,9 +138,7 @@
       <geometry><box size="0.02 0.05 0.02"/></geometry>
       <material name="my_rgbd_blue"><color rgba="0 0 1 1"/></material>
     </visual>
-    <collision>
-      <geometry><box size="0.02 0.05 0.02"/></geometry>
-    </collision>
+
     <inertial>
       <mass value="0.1"/>
       <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
@@ -178,14 +176,29 @@
     </plugin>
   </gazebo>
 
-  <gazebo reference="base_scan">
+<gazebo reference="base_scan">
     <sensor name="hls_lfcd_lds" type="ray">
       <always_on>true</always_on>
-      <visualize>false</visualize>
-      <update_rate>5</update_rate>
+      <!-- 1. 强制开启可视化，确保你能看到华丽的蓝色射线 -->
+      <visualize>true</visualize> 
+      <!-- 2. 稍微提高扫描频率，从 5Hz 提升到 10Hz，让建图和避障反应更迅速 -->
+      <update_rate>10</update_rate>
       <ray>
-        <scan><horizontal><samples>360</samples><resolution>1</resolution><min_angle>0</min_angle><max_angle>6.28</max_angle></horizontal></scan>
-        <range><min>0.12</min><max>3.5</max><resolution>0.015</resolution></range>
+        <scan>
+          <horizontal>
+            <!-- 3. 将采样点从 360 提升到 720，远距离扫描时线条更密集，地图更精细 -->
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>6.2831853</max_angle> <!-- 使用精确的 2π 确保完美的 360 度闭环 -->
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.12</min>
+          <!-- 🚀 核心修复：将最大测距从可怜的 3.5 米，直接拉满到 30.0 米！ -->
+          <max>30.0</max>
+          <resolution>0.015</resolution>
+        </range>
       </ray>
       <plugin name="turtlebot3_laserscanner" filename="libgazebo_ros_ray_sensor.so">
         <ros><remapping>~/out:=scan</remapping></ros>
